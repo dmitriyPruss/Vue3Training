@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Изучаем Vue 3</title>
+    <meta charset="utf-8" />
+    <style>
+      .isGreen {
+        color: green;
+      }
+      .isRed {
+        color: red;
+        cursor: pointer;
+      }
+      .back {
+        background-color: yellow;
+        border: 1px solid black;
+        box-sizing: border-box;
+      }
+      .square {
+        width: 100px;
+        height: 100px;
+        border: 1px solid grey;
+        border-radius: 7px;
+        margin: 10px 0;
+      }
+      .red-back {
+        background-color: red;
+      }
+      .green-back {
+        background: green;
+      }
+      .blue-back {
+        background: blue;
+      }
+      .white {
+        color: white;
+      }
+      .yellow {
+        color: yellow;
+      }
+      .brown {
+        color: brown;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <p v-html="getRandom()" v-once></p>
+      <input type="text" v-on:input="setMessage" />
+      <p v-text="message"></p>
+      <button v-on:click="changeMessage">{{buttonData}}</button>
+      <p>{{buttonData === "Click me!" ? "No clicks" : null}}</p>
+      <a v-bind:href="link" :target="target">to View docs</a>
+      <hr />
+      <button @click="getEventData($event), decrease(10)">-</button>
+      <span>{{counter}}</span>
+      <button @click="getEventData($event), increase(10)">+</button>
+      <br />
+      <hr />
+      <input type="number" v-model="mathData.x" placeholder="Enter x" />
+      <br />
+      <input type="number" v-model="mathData.y" placeholder="Enter y" />
+      <p>Multiply: {{mathData.x * mathData.y}}</p>
+      <hr />
+      <input type="text" v-model="firstname" />
+      <input type="text" v-model="surname" /><input
+        type="text"
+        v-model="fullname"
+      />
+      <p>{{fullname}}</p>
+      <hr />
+      <input type="number" v-model="age" />
+      <p>{{result}}</p>
+      <hr />
+      <h3
+        ref="thirdHeader"
+        v-bind:class="{isRed:isRedColorActive, isGreen: !isRedColorActive, back: isBack}"
+        @mouseover="isRedColorActive=!isRedColorActive"
+        @mouseout="isRedColorActive=!isRedColorActive"
+      >
+        Start...
+      </h3>
+      <button @click="changeHeader">Change</button>
+      <button @click="isBack=!isBack">Change background</button>
+      <hr />
+      <div
+        class="square"
+        v-bind:class="[square.background, square.color]"
+        v-bind:style="[sizeStyle, borderRadiusStyle]"
+      >
+        Hi!
+      </div>
+      <input type="text" v-model="square.background" />
+      <br />
+      <input type="text" v-model="square.color" />
+      <br />
+      <input type="number" v-model="square.size" />
+      <br />
+      <input type="number" v-model="square.borderRadius" />
+    </div>
+    <script src="https://unpkg.com/vue@next"></script>
+    <script>
+      const appData = {
+        data() {
+          return {
+            message: "Hello Vue 3!",
+            buttonData: "Click me!",
+            link: "https://vuejs.org/",
+            target: "blank",
+            counter: 0,
+            mathData: {
+              x: 5,
+              y: 5,
+            },
+            firstname: "Yan",
+            surname: "Grim",
+            age: 10,
+            result: "",
+            isRedColorActive: false,
+            isBack: false,
+            square: {
+              background: "red-back",
+              color: "white",
+              size: 100,
+              borderRadius: 0,
+            },
+          };
+        },
+        computed: {
+          fullname: {
+            get: function () {
+              return this.firstname + " " + this.surname;
+            },
+            set: function (newValue) {
+              console.log("newValue", newValue);
+              const names = newValue.split(" ");
+              this.firstname = names[0];
+              this.surname = names[names.length - 1];
+            },
+          },
+          sizeStyle() {
+            return {
+              height: this.square.size + "px",
+              width: this.square.size + "px",
+            };
+          },
+          borderRadiusStyle() {
+            return {
+              "border-radius": this.square.borderRadius + "px",
+            };
+          },
+        },
+        methods: {
+          setMessage(event) {
+            this.message = event.target.value;
+          },
+          getRandom() {
+            return `<i>Random value: ${Math.round(
+              Math.random() * 1000000
+            )}</i>`;
+          },
+          changeMessage(e) {
+            console.log("e.target", e.target.textContent);
+            if (e.target.textContent === "Click me!") {
+              this.buttonData = "Clicked!";
+            } else {
+              this.buttonData = "STOP!";
+            }
+          },
+          getEventData(e) {
+            console.log("e", e);
+          },
+          increase(val) {
+            this.counter += val;
+          },
+          decrease(val) {
+            this.counter -= val;
+          },
+          checkAge(value) {
+            this.result = "Wait...";
+
+            setTimeout(() => {
+              this.result = value > 18 ? "Access allowed" : "Access denied";
+            }, 3000);
+          },
+          changeHeader() {
+            this.$refs.thirdHeader.innerText = `${Math.floor(
+              Math.random() * 10000
+            )}`;
+          },
+        },
+        watch: {
+          age: function (newAge) {
+            if (newAge > 0 && newAge < 100) {
+              this.checkAge(newAge);
+            }
+          },
+        },
+      };
+
+      const app = Vue.createApp(appData);
+      app.mount("#app");
+    </script>
+  </body>
+</html>
