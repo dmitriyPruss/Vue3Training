@@ -45,7 +45,7 @@
   </head>
   <body>
     <div id="app">
-      <p v-html="getRandom()" v-once></p>
+      <!-- <p v-html="getRandom()" v-once></p>
       <input type="text" v-on:input="setMessage" />
       <p v-text="message"></p>
       <button v-on:click="changeMessage">{{buttonData}}</button>
@@ -66,8 +66,8 @@
       <input type="text" v-model="surname" /><input
         type="text"
         v-model="fullname"
-      />
-      <p>{{fullname}}</p>
+      /> -->
+      <!-- <p>{{fullname}}</p>
       <hr />
       <input type="number" v-model="age" />
       <p>{{result}}</p>
@@ -97,6 +97,79 @@
       <input type="number" v-model="square.size" />
       <br />
       <input type="number" v-model="square.borderRadius" />
+      <hr />
+      <template v-if="isFirstParagraph===1">
+        <h3>First</h3>
+        <p>
+          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Vitae,
+          cupiditate quam. Repellendus rerum dolore magni sequi eos esse
+          officiis quos pariatur quidem, ipsam magnam rem sapiente ex quam
+          facere praesentium?
+        </p>
+      </template>
+      <template v-else-if="isFirstParagraph===2">
+        <h3>Second</h3>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Saepe, nobis
+          blanditiis. Deserunt voluptas vitae temporibus, corporis eveniet
+          asperiores repellendus dicta, facilis velit amet omnis beatae quam
+          minus, deleniti inventore nobis?
+        </p>
+      </template>
+      <template v-else>
+        <h3>Other</h3>
+        <p>
+          Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sint
+          voluptate eaque saepe, a error officia ut assumenda sunt excepturi
+          amet deserunt minus incidunt maxime doloremque unde quia quaerat
+          culpa. Vitae.
+        </p>
+      </template>
+      <input type="number" v-model="isFirstParagraph" />
+      <hr />
+      <p v-show="isShow">Show</p>
+      <button @click="isShow=!isShow">Show or hide</button> -->
+
+      <ul>
+        <li v-for="(element, index) in progLangs">
+          <h3>{{index + 1}}</h3>
+          <template v-for="(value, key) in element">
+            <span>{{key}}</span>: <i>{{value}}</i>
+            <br />
+          </template>
+        </li>
+      </ul>
+      <div>
+        <template v-for="num in nums">
+          <p v-if="num > 10">{{num}}</p>
+        </template>
+      </div>
+      <hr />
+      <input type="number" v-model="startFilm" />
+      <input type="number" v-model="endFilm" />
+      <p>
+        <input type="text" v-model="newFilm" />
+        <button @click="films.push(newFilm)">Add</button>
+      </p>
+      <ul>
+        <li v-for="(film, index) in visibleFilms">
+          <span>{{film}}</span
+          ><button @click="films.splice(index, 1)">Delete</button>
+        </li>
+      </ul>
+      <hr />
+      <input type="text" v-model="laptop" />
+      <ul>
+        <li>
+          <button @click="sortParam='company'">Company</button>
+          <button @click="sortParam='model'">Model</button>
+          <button @click="sortParam='price'">Price</button>
+        </li>
+        <li v-for="lap in filteredLapTops">
+          <span>{{lap.company}}</span> / <span>{{lap.model}}</span> /
+          <span>{{lap.price}}</span>
+        </li>
+      </ul>
     </div>
     <script src="https://unpkg.com/vue@next"></script>
     <script>
@@ -124,9 +197,51 @@
               size: 100,
               borderRadius: 0,
             },
+            isFirstParagraph: 1,
+            isShow: true,
+            progLangs: [
+              { name: "C++", level: "hard" },
+              { name: "Javascript", level: "middle" },
+              { name: "Basic", level: "easy" },
+            ],
+            nums: [1, 3, 5, 7, 8, 145, 35, 67],
+            films: [],
+            newFilm: "",
+            startFilm: 0,
+            endFilm: 2,
+            laptop: "",
+            lapTops: [
+              { company: "Acer", model: "Aspire", price: "20000" },
+              { company: "Acer", model: "Nitro", price: "30000" },
+              { company: "Lenovo", model: "Idea", price: "40000" },
+              { company: "Asus", model: "FS", price: "50000" },
+              { company: "Apple", model: "Ipad", price: "70000" },
+            ],
+            sortParam: "",
           };
         },
         computed: {
+          visibleFilms() {
+            return this.films.slice(this.startFilm, this.endFilm);
+          },
+          filteredLapTops() {
+            const filteredData = this.lapTops.filter((elem) => {
+              return this.laptop === ""
+                ? true
+                : elem.company.indexOf(this.laptop) > -1;
+            });
+
+            switch (this.sortParam) {
+              case "company":
+                return filteredData.sort(sortByCompany);
+              case "model":
+                return filteredData.sort(sortByModel);
+              case "price":
+                return filteredData.sort(sortByPrice);
+              default:
+                return filteredData;
+            }
+          },
           fullname: {
             get: function () {
               return this.firstname + " " + this.surname;
@@ -197,6 +312,13 @@
           },
         },
       };
+
+      const sortByCompany = (current, next) =>
+        current.company.toLowerCase() > next.company.toLowerCase() ? 1 : -1;
+      const sortByModel = (current, next) =>
+        current.model.toLowerCase() > next.model.toLowerCase() ? 1 : -1;
+      const sortByPrice = (current, next) =>
+        current.price > next.price ? 1 : -1;
 
       const app = Vue.createApp(appData);
       app.mount("#app");
